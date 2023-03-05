@@ -96,56 +96,65 @@ const TinderCard = React.forwardRef(
     settings.swipeThreshold = swipeThreshold
 
     React.useImperativeHandle(ref, () => ({
-      async swipe (dir = 'right') {
-        if (onSwipe) onSwipe(dir)
-        const power = 1.3
-        const disturbance = (Math.random() - 0.5) / 2
-        if (dir === 'right') {
-          await animateOut({ x: power, y: disturbance }, setSpringTarget)
-        } else if (dir === 'left') {
-          await animateOut({ x: -power, y: disturbance }, setSpringTarget)
-        } else if (dir === 'up') {
-          await animateOut({ x: disturbance, y: power }, setSpringTarget)
-        } else if (dir === 'down') {
-          await animateOut({ x: disturbance, y: -power }, setSpringTarget)
+  async swipe (dir = 'right') {
+    const power = 1.3
+    const disturbance = (Math.random() - 0.5) / 2
+    if (dir === 'right') {
+      await animateOut({ x: power, y: disturbance }, setSpringTarget)
+    } else if (dir === 'left') {
+      await animateOut({ x: -power, y: disturbance }, setSpringTarget)
+    } else if (dir === 'up') {
+      await animateOut({ x: disturbance, y: power }, setSpringTarget)
+    } else if (dir === 'down') {
+      await animateOut({ x: disturbance, y: -power }, setSpringTarget)
+    }
+    handleSwipe(dir)
+    if (onCardLeftScreen) onCardLeftScreen(dir)
+  },
+  async restoreCard () {
+    await animateBack(setSpringTarget)
+  }
+}))
+
+const handleSwipe = React.useCallback(
+  (dir) => {
+    if (onSwipe) {
+      onSwipe(dir)
+    }
+  },
+  [onSwipe]
+)
+
+const handleSwipeReleased = React.useCallback(
+  async (setSpringTarget, gesture) => {
+    // Check if this is a swipe
+    const dir = getSwipeDirection({
+      x: swipeRequirementType === 'velocity' ? gesture.vx : gesture.dx,
+      y: swipeRequirementType === 'velocity' ? gesture.vy : gesture.dy
+    })
+
+    if (dir !== 'none') {
+      if (flickOnSwipe) {
+        if (!preventSwipe.includes(dir)) {
+          handleSwipe(dir)
+          await animateOut(swipeRequirementType === 'velocity' ? ({
+            x: gesture.vx,
+            y: gesture.vy
+          }) : (
+            normalize({ x: gesture.dx, y: gesture.dy }) // Normalize to avoid flicking the card away with super fast speed only direction is wanted here
+          ), setSpringTarget, swipeRequirementType)
+          if (onCardLeftScreen) onCardLeftScreen(dir)
+          return
         }
-        if (onCardLeftScreen) onCardLeftScreen(dir)
-      },
-      async restoreCard () {
-        await animateBack(setSpringTarget)
       }
-    }))
+    }
 
-    const handleSwipeReleased = React.useCallback(
-      async (setSpringTarget, gesture) => {
-        // Check if this is a swipe
-        const dir = getSwipeDirection({
-          x: swipeRequirementType === 'velocity' ? gesture.vx : gesture.dx,
-          y: swipeRequirementType === 'velocity' ? gesture.vy : gesture.dy
-        })
+    // Card was not flicked away, animate back to start
+    animateBack(setSpringTarget)
+  },
+  [swipeRequirementType, flickOnSwipe, preventSwipe, handleSwipe, animateOut, onCardLeftScreen]
+)
 
-        if (dir !== 'none') {
-          if (flickOnSwipe) {
-            if (!preventSwipe.includes(dir)) {
-              if (onSwipe) onSwipe(dir)
-
-              await animateOut(swipeRequirementType === 'velocity' ? ({
-                x: gesture.vx,
-                y: gesture.vy
-              }) : (
-                normalize({ x: gesture.dx, y: gesture.dy }) // Normalize to avoid flicking the card away with super fast speed only direction is wanted here
-              ), setSpringTarget, swipeRequirementType)
-              if (onCardLeftScreen) onCardLeftScreen(dir)
-              return
-            }
-          }
-        }
-
-        // Card was not flicked away, animate back to start
-        animateBack(setSpringTarget)
-      },
-      [swipeRequirementType, flickOnSwipe, preventSwipe, onSwipe, onCardLeftScreen]
-    )
 
     let swipeThresholdFulfilledDirection = 'none'
 
