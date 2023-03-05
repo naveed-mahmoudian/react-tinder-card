@@ -91,7 +91,7 @@ const TinderCard = React.forwardRef(
     const [{ xyrot }, setSpringTarget] = useSpring(() => ({
       xyrot: [0, 0, 0],
       config: physics.touchResponsive
-    }))
+    }), [])
 
     settings.swipeThreshold = swipeThreshold
 
