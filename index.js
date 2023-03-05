@@ -91,7 +91,7 @@ const TinderCard = React.forwardRef(
     const [{ xyrot }, setSpringTarget] = useSpring(() => ({
       xyrot: [0, 0, 0],
       config: physics.touchResponsive
-    }), [])
+    }))
 
     settings.swipeThreshold = swipeThreshold
 
@@ -179,14 +179,14 @@ const TinderCard = React.forwardRef(
         const gestureState = gestureStateFromWebEvent(ev, startPositon, lastPosition, true)
         lastPosition = gestureState
         startPositon = { x: ev.touches[0].clientX, y: ev.touches[0].clientY }
-      })
+      }, {once: true})
 
       element.current.addEventListener(('mousedown'), (ev) => {
         isClicking = true
         const gestureState = gestureStateFromWebEvent(ev, startPositon, lastPosition, false)
         lastPosition = gestureState
         startPositon = { x: ev.clientX, y: ev.clientY }
-      })
+      }, {once: true})
 
       const handleMove = (gestureState) => {
         // Check fulfillment
@@ -217,7 +217,7 @@ const TinderCard = React.forwardRef(
         const gestureState = gestureStateFromWebEvent(ev, startPositon, lastPosition, false)
         lastPosition = gestureState
         handleMove(gestureState)
-      })
+      }, {once: true})
 
       window.addEventListener(('mouseup'), (ev) => {
         if (!isClicking) return
@@ -225,19 +225,19 @@ const TinderCard = React.forwardRef(
         handleSwipeReleased(setSpringTarget, lastPosition)
         startPositon = { x: 0, y: 0 }
         lastPosition = { dx: 0, dy: 0, vx: 0, vy: 0, timeStamp: Date.now() }
-      })
+      }, {once: true})
 
       element.current.addEventListener(('touchmove'), (ev) => {
         const gestureState = gestureStateFromWebEvent(ev, startPositon, lastPosition, true)
         lastPosition = gestureState
         handleMove(gestureState)
-      })
+      }, {once: true})
 
       element.current.addEventListener(('touchend'), (ev) => {
         handleSwipeReleased(setSpringTarget, lastPosition)
         startPositon = { x: 0, y: 0 }
         lastPosition = { dx: 0, dy: 0, vx: 0, vy: 0, timeStamp: Date.now() }
-      })
+      }, {once: true})
     }, [])
 
     const element = React.useRef()
