@@ -216,7 +216,7 @@ const TinderCard = React.forwardRef(
         if (!isClicking) return
         const gestureState = gestureStateFromWebEvent(ev, startPositon, lastPosition, false)
         lastPosition = gestureState
-        handleMove(gestureState)
+        return handleMove(gestureState)
       }, {once: true})
 
       window.addEventListener(('mouseup'), (ev) => {
@@ -230,7 +230,7 @@ const TinderCard = React.forwardRef(
       element.current.addEventListener(('touchmove'), (ev) => {
         const gestureState = gestureStateFromWebEvent(ev, startPositon, lastPosition, true)
         lastPosition = gestureState
-        handleMove(gestureState)
+        return handleMove(gestureState)
       }, {once: true})
 
       element.current.addEventListener(('touchend'), (ev) => {
