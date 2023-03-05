@@ -108,7 +108,6 @@ const TinderCard = React.forwardRef(
     } else if (dir === 'down') {
       await animateOut({ x: disturbance, y: -power }, setSpringTarget)
     }
-    handleSwipe(dir)
     if (onCardLeftScreen) onCardLeftScreen(dir)
   },
   async restoreCard () {
