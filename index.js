@@ -144,7 +144,7 @@ const TinderCard = React.forwardRef(
         // Card was not flicked away, animate back to start
         animateBack(setSpringTarget)
       },
-      [swipeRequirementType, flickOnSwipe, preventSwipe, onSwipe, onCardLeftScreen]
+      [flickOnSwipe, preventSwipe, onSwipe, onCardLeftScreen]
     )
 
     let swipeThresholdFulfilledDirection = 'none'
